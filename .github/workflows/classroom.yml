@@ -1,0 +1,110 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: basicFlightSearch01
+      id: basicflightsearch01
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: basicFlightSearch01
+        setup-command: ''
+        command: gradle test --tests TestMain.basicFlightSearch01
+        timeout: 10
+        max-score: 2
+    - name: exceptionsFlightSearch02
+      id: exceptionsflightsearch02
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: exceptionsFlightSearch02
+        setup-command: ''
+        command: gradle test --tests TestMain.exceptionsFlightSearch02
+        timeout: 10
+        max-score: 2
+    - name: basicRunwayInfo03
+      id: basicrunwayinfo03
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: basicRunwayInfo03
+        setup-command: ''
+        command: gradle test --tests TestMain.basicRunwayInfo03
+        timeout: 10
+        max-score: 4
+    - name: urgentRunwayInfo04
+      id: urgentrunwayinfo04
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: urgentRunwayInfo04
+        setup-command: ''
+        command: gradle test --tests TestMain.urgentRunwayInfo04
+        timeout: 10
+        max-score: 4
+    - name: maneuverPrintFree05
+      id: maneuverprintfree05
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: maneuverPrintFree05
+        setup-command: ''
+        command: gradle test --tests TestMain.maneuverPrintFree05
+        timeout: 10
+        max-score: 5
+    - name: maneuverPrintOccupied06
+      id: maneuverprintoccupied06
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: maneuverPrintOccupied06
+        setup-command: ''
+        command: gradle test --tests TestMain.maneuverPrintOccupied06
+        timeout: 10
+        max-score: 6
+    - name: exceptionsManeuver07
+      id: exceptionsmaneuver07
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: exceptionsManeuver07
+        setup-command: ''
+        command: gradle test --tests TestMain.exceptionsManeuver07
+        timeout: 10
+        max-score: 7
+    - name: exceptionsAll08
+      id: exceptionsall08
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: exceptionsAll08
+        setup-command: ''
+        command: gradle test --tests TestMain.exceptionsAll08
+        timeout: 10
+        max-score: 8
+    - name: allCases09
+      id: allcases09
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: allCases09
+        setup-command: ''
+        command: gradle test --tests TestMain.allCases09
+        timeout: 10
+        max-score: 12
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        BASICFLIGHTSEARCH01_RESULTS: "${{steps.basicflightsearch01.outputs.result}}"
+        EXCEPTIONSFLIGHTSEARCH02_RESULTS: "${{steps.exceptionsflightsearch02.outputs.result}}"
+        BASICRUNWAYINFO03_RESULTS: "${{steps.basicrunwayinfo03.outputs.result}}"
+        URGENTRUNWAYINFO04_RESULTS: "${{steps.urgentrunwayinfo04.outputs.result}}"
+        MANEUVERPRINTFREE05_RESULTS: "${{steps.maneuverprintfree05.outputs.result}}"
+        MANEUVERPRINTOCCUPIED06_RESULTS: "${{steps.maneuverprintoccupied06.outputs.result}}"
+        EXCEPTIONSMANEUVER07_RESULTS: "${{steps.exceptionsmaneuver07.outputs.result}}"
+        EXCEPTIONSALL08_RESULTS: "${{steps.exceptionsall08.outputs.result}}"
+        ALLCASES09_RESULTS: "${{steps.allcases09.outputs.result}}"
+      with:
+        runners: basicflightsearch01,exceptionsflightsearch02,basicrunwayinfo03,urgentrunwayinfo04,maneuverprintfree05,maneuverprintoccupied06,exceptionsmaneuver07,exceptionsall08,allcases09
