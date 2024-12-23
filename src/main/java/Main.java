@@ -134,8 +134,6 @@ public class Main {
             } catch (IOException e) {
                 throw new IOException(e.getMessage());
             }
-        } else {
-            System.out.println("Tema2");
         }
     }
 }

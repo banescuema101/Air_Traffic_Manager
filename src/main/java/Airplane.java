@@ -93,7 +93,6 @@ public abstract class Airplane {
     public void setUrgent(String urgent) {
         this.urgent = urgent;
     }
-
     public String toString() {
         return this.model + " - " + this.id + " - " + this.locatiePlecare + " - " + this.destinatie + " - " + this.status + " - " + this.timpDorit.toString() + " - ";
     }

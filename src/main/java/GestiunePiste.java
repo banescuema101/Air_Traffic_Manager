@@ -69,6 +69,7 @@ public class GestiunePiste {
         }
         return rezultat;
     }
+
     public void afisareRunwayInfo(String idPista, LocalTime timestamp, PrintWriter pw) {
         helperAfisareRunwayInfo(findNarrowRunway(idPista), timestamp, pw);
         helperAfisareRunwayInfo(findWideRunway(idPista), timestamp, pw);

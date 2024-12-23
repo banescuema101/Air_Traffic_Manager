@@ -2,6 +2,7 @@ import java.util.Comparator;
 
 public class RunwayComparatorLanding <T extends Airplane> implements Comparator<T> {
     @Override
+
     public int compare(T airplane1, T airplane2) {
         if (airplane1.getUrgent() != null && airplane2.getUrgent() != null) {
             return airplane1.getTimpDorit().compareTo(airplane2.getTimpDorit());

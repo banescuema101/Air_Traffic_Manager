@@ -134,6 +134,7 @@ public class Runway<T extends Airplane> {
                 } else if (avionExtras != null && avionExtras.getStatus().equals(Status.WAITING_FOR_TAKEOFF)) {
                     avionExtras.setStatus(Status.DEPARTED);
                 }
+
                 this.setStatusPista(StatusRunway.OCCUPIED);
                 // actaulizarea statusului si a timpului pana la care va fi ocupata pista.
                 if (this.getUtilizare().equals("landing")) {
