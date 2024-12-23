@@ -1,12 +1,18 @@
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+enum StatusRunway{
+    FREE,
+    OCCUPIED
+}
 public class Runway<T extends Airplane> {
     private LocalTime timestamp;
     private String id;
     private String utilizare;
     private PriorityQueue<T> coadaAvioane;
+    private StatusRunway statusPista;
+    // timpul PANA LA CARE este pista ocupata. !!
+    private LocalTime timeOccupied;
     public Runway() {
 
     }
@@ -15,6 +21,7 @@ public class Runway<T extends Airplane> {
         this.id = id;
         this.utilizare = utilizare;
         this.coadaAvioane = new PriorityQueue<>(comparator);
+        this.statusPista = StatusRunway.FREE;
     }
 
     public LocalTime getTimestamp() {
@@ -49,41 +56,100 @@ public class Runway<T extends Airplane> {
         this.coadaAvioane = coadaAvioane;
     }
 
-    public void adaugaAvion(T avion) {
-        if ("Bucharest".equals(avion.getDestinatie()) && "takeoff".equals(this.getUtilizare())) {
-            // daca doreste aterizarea dar pista este una de decolare = > arunc exceptie.
-//            throw IncorrectRunwayException();
+    public StatusRunway getStatusPista() {
+        return statusPista;
+    }
 
+    public void setStatusPista(StatusRunway statusPista) {
+        this.statusPista = statusPista;
+    }
+
+    public LocalTime getTimeOccupied() {
+        return timeOccupied;
+    }
+
+    public void setTimeOccupied(LocalTime timeOccupied) {
+        this.timeOccupied = timeOccupied;
+    }
+
+    public void adaugaAvion(T avion, LocalTime timestamp) throws IncorrectRunwayException {
+        if ("Bucharest".equals(avion.getDestinatie()) && "takeoff".equals(this.getUtilizare())
+            || !("Bucharest".equals(avion.getDestinatie())) && "landing".equals(this.getUtilizare())) {
+            // daca doreste aterizarea dar pista este una de decolare = > arunc exceptie.
+            throw new IncorrectRunwayException(timestamp.toString() + " | The chosen runway for allocating the plane is incorrect");
+        } else {
+            coadaAvioane.offer(avion);
         }
-        coadaAvioane.offer(avion);
     }
     public String toString() {
         StringBuilder sir = new StringBuilder();
         sir.append(this.id);
         sir.append("\n");
-        Iterator<T> valIterator = coadaAvioane.iterator();
-        while (valIterator.hasNext()) {
-            sir.append(valIterator.next().toString());
+        PriorityQueue<T> auxQueue = new PriorityQueue<>(coadaAvioane);
+        while (!auxQueue.isEmpty()) {
+            sir.append(auxQueue.poll().toString());
             sir.append("\n");
         }
         return sir.toString();
     }
-    public static void main(String[] args) {
-        // pentru testarea de inceput.
-        // !! SA NU uit sa o sterg.
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        LocalTime timp1 = LocalTime.parse("12:01:29", formatter);
-        LocalTime timp2 = LocalTime.parse("10:10:25", formatter);
-        LocalTime timp3 = LocalTime.parse("09:01:29", formatter);
-        WideBodyAirplane avion1 = new WideBodyAirplane("militart", "id1", "Germania", "Bucharest", timp1, "urgent");
-        WideBodyAirplane avion2 = new WideBodyAirplane("comercial", "id2", "Bucharest", "Germania", timp2, "urgent");
-        WideBodyAirplane avion3 = new WideBodyAirplane("fain", "id3", "Australia", "Bucharest", timp3, null);
 
-//        Runway<WideBodyAirplane> runway1 = new Runway<WideBodyAirplane>(timp1, "pista1", "landing", "wideBody");
-//        Runway<NarrowBodyAirplane> runway2 = new Runway<NarrowBodyAirplane>(timp1, "pista1", "landing", "wideBody");
-//        runway1.adaugaAvion(avion1);
-//        runway1.adaugaAvion(avion2);
-//        runway1.adaugaAvion(avion3);
-//        System.out.println(runway1.toString());
+    /**
+     * Metoda de cautare si returnare a unui avion din colectia de zboruri a pistei, care
+     * are un anumit id dorit si transmis ca parametru.
+     * @param idZbor id-ului unui zbor.
+     * @return
+     */
+    public T cautaAirplane(String idZbor) {
+        Iterator<T> valIterator = coadaAvioane.iterator();
+        while (valIterator.hasNext()) {
+            T avionFound = valIterator.next();
+            if (idZbor.equals(avionFound.getId())) {
+                return avionFound;
+            }
+        }
+        return null;
+    }
+    public T extrageAvion(LocalTime timestamp) throws UnavailableRunwayException {
+        // nu vreau sa il sterg, doar sa il extrag.
+        LocalTime timestampAux = timestamp.plusMinutes(1);
+        if (this.getStatusPista().equals(StatusRunway.OCCUPIED) && this.getTimeOccupied().isBefore(timestampAux)) {
+            this.setStatusPista(StatusRunway.FREE);
+        }
+        if (this.getStatusPista().equals(StatusRunway.FREE)) {
+            PriorityQueue<T> auxQueue = new PriorityQueue<>(coadaAvioane);
+            T avionExtras = null;
+            boolean gasit = false;
+            while(!auxQueue.isEmpty()) {
+                T airplane = auxQueue.poll();
+                System.out.println("testare-extragere-avion:" + airplane);
+                if (!airplane.getStatus().equals(Status.LANDED) && !airplane.getStatus().equals(Status.DEPARTED)) {
+                    avionExtras = airplane;
+                    gasit = true;
+                    break;
+                }
+            }
+            if (gasit) {
+                if (avionExtras != null && avionExtras.getStatus().equals(Status.WAITING_FOR_LANDING)) {
+                    avionExtras.setStatus(Status.LANDED);
+                } else if (avionExtras != null && avionExtras.getStatus().equals(Status.WAITING_FOR_TAKEOFF)) {
+                    avionExtras.setStatus(Status.DEPARTED);
+                }
+                this.setStatusPista(StatusRunway.OCCUPIED);
+                // actaulizarea statusului si a timpului pana la care va fi ocupata pista.
+                if (this.getUtilizare().equals("landing")) {
+                    LocalTime timestampDelay1 = timestamp.plusMinutes(10);
+                    this.setTimeOccupied(timestampDelay1);
+                } else if (this.getUtilizare().equals("takeoff")) {
+                    LocalTime timestampDelay2 = timestamp.plusMinutes(5);
+                    this.setTimeOccupied(timestampDelay2);
+                }
+                return avionExtras;
+            }
+        } else {
+            // daca practic au trecut cele 5/10 minute in care pista a fost ocupata
+            // ii vom actualiza statusul.
+            throw new UnavailableRunwayException(timestamp);
+        }
+        return null;
     }
 }

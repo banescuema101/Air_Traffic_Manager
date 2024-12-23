@@ -1,7 +1,4 @@
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-
 enum Status {
     WAITING_FOR_TAKEOFF,
     DEPARTED,
@@ -9,6 +6,7 @@ enum Status {
     LANDED
 }
 public abstract class Airplane {
+
     private String model;
     private String urgent;  // Nu stiu daca am pus -o bine aici.
     private String id;
@@ -97,6 +95,6 @@ public abstract class Airplane {
     }
 
     public String toString() {
-        return this.model + " - " + this.id + " - " + this.locatiePlecare + " - " + this.destinatie + " - " + this.status + " - " + this.timpDorit;
+        return this.model + " - " + this.id + " - " + this.locatiePlecare + " - " + this.destinatie + " - " + this.status + " - " + this.timpDorit.toString() + " - ";
     }
 }
