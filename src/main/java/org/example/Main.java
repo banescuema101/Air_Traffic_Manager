@@ -1,3 +1,5 @@
+package org.example;
+
 import java.io.FileNotFoundException;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -10,29 +12,27 @@ import java.time.format.DateTimeFormatter;
 public class Main {
     public static void main(String[] args) throws IOException {
         if (args.length > 0) {
-            String antetResources = "../resources/";
+            String antetResources = "src/main/resources/";
             String fisierIntrare = antetResources + args[0] + "/" + "input.in";
             String fisierExceptii = antetResources + args[0] + "/"+ "board_exceptions.out";
-            String fisierOut = antetResources + args[0] + "/" + "flights_info.out";
-            String fisierBoardExceptions = antetResources + args[0] + "/"+ "board_exceptions.out";
+            String fisierOut = antetResources + args[0] + "/" + "flight_info.out";
             try {
-                // fisierul in care voi scrie exceptiile de tip IncorrectRunway line by line.
+                // fisierul in care voi scrie exceptiile de tip IncorrectRunway si UnavailableRunway line by line.
                 FileWriter fw = new FileWriter(fisierExceptii, true);
-                PrintWriter pw = new PrintWriter(fw);
-                // fisierul in care voi scrie exceptiile de tipul unavailable runway exceptions.
-                FileWriter fwBoardExceptions = new FileWriter(fisierBoardExceptions, true);
-                PrintWriter pwBoardExceptions = new PrintWriter(fwBoardExceptions);
+                PrintWriter pwExceptii = new PrintWriter(fw);
                 // file ul de intrare, din care citesc informatiile
                 FileReader fr = new FileReader(fisierIntrare);
                 BufferedReader br = new BufferedReader(fr);
-                // fisierul de flights_info.out
+                // fisierul de iesire: flights_info.out
                 FileWriter fwOut = new FileWriter(fisierOut, true);
                 PrintWriter pwOut = new PrintWriter(fwOut);
                 String linie;
                 // un formatter de tip ora:minut:secunde
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
                 GestiunePiste gestiunePiste = new GestiunePiste();
-                while ((linie = br.readLine()) != null) {
+                // verific ca reusesc sa fac citirea liniei, cat si faptul CA NU E GOAALA doar cu
+                // trailing space-uri...
+                while ((linie = br.readLine()) != null && !linie.isEmpty()) {
                     String[] textLinie = linie.split(" - ");
                     String comanda = textLinie[1];
                     String sirCuTimpul = textLinie[0];
@@ -71,7 +71,7 @@ public class Main {
                             LocalTime timpDorit = LocalTime.parse(textLinie[7], formatter);
                             String idPista = textLinie[8];
                             // urgent poate fi null sau poate exista Stringul "urgent:
-                            // acest lucru este gestionat de constructorul clasei abstracta Airplane.
+                            // acest lucru este gestionat de constructorul clasei abstracta org.example.Airplane.
                             String urgent = null;
                             if (textLinie.length == 10) {
                                 urgent = textLinie[9];
@@ -85,7 +85,7 @@ public class Main {
                                     runwayFoundNarrow.adaugaAvion(new NarrowBodyAirplane(model, idZbor, plecare, destinatie, timpDorit, urgent), timestamp);
                                 }
                             } catch (IncorrectRunwayException e) {
-                                pw.println(e.getMessage());
+                                pwExceptii.println(e.getMessage());
                             }
                             gestiunePiste.listareWideRunway();
                             gestiunePiste.listareNarrowRunway();
@@ -98,9 +98,9 @@ public class Main {
                             break;
                         case "runway_info":
                             String idRunway = textLinie[2];
-                            DateTimeFormatter formatterDouaPuncte = DateTimeFormatter.ofPattern("HH:mm:ss");
                             DateTimeFormatter formatterCuLinii = DateTimeFormatter.ofPattern("HH-mm-ss");
-                            LocalTime timestampFormatat1 = LocalTime.parse(textLinie[0], formatterDouaPuncte);
+                            LocalTime timestampFormatat1 = LocalTime.parse(textLinie[0], formatter);
+                            // pentru a crea fisierul runway_info name_ora-minut-secunde
                             String timestampFormatatCuSecunde1 = timestampFormatat1.format(formatterCuLinii);
                             String fisierRunwayInfo = antetResources + args[0] + "/" + "runway_info_" + idRunway + "_" + timestampFormatatCuSecunde1 + ".out";
                             FileWriter fwRunwayInfo = new FileWriter(fisierRunwayInfo, true);
@@ -119,15 +119,14 @@ public class Main {
                                     runwayNarrow.extrageAvion(timestamp);
                                 }
                             } catch (UnavailableRunwayException e) {
-                                pwBoardExceptions.println(e.getMessage());
+                                pwExceptii.println(e.getMessage());
                             }
                             break;
-                        default:
+                        case "exit":
                             break;
                     }
                 }
-                pw.close();
-                pwBoardExceptions.close();
+                pwExceptii.close();
                 pwOut.close();
             } catch (FileNotFoundException e) {
                 throw new FileNotFoundException(e.getMessage());

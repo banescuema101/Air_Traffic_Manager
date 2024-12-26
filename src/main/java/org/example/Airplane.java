@@ -1,3 +1,5 @@
+package org.example;
+import java.time.format.DateTimeFormatter;
 import java.time.LocalTime;
 enum Status {
     WAITING_FOR_TAKEOFF,
@@ -6,7 +8,6 @@ enum Status {
     LANDED
 }
 public abstract class Airplane {
-
     private String model;
     private String urgent;  // Nu stiu daca am pus -o bine aici.
     private String id;
@@ -94,6 +95,13 @@ public abstract class Airplane {
         this.urgent = urgent;
     }
     public String toString() {
-        return this.model + " - " + this.id + " - " + this.locatiePlecare + " - " + this.destinatie + " - " + this.status + " - " + this.timpDorit.toString() + " - ";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String timpDoritFormatatCuSecunde = timpDorit.format(formatter);
+        if (timpConcret == null) {
+            return this.model + " - " + this.id + " - " + this.locatiePlecare + " - " + this.destinatie + " - " + this.status + " - " + timpDoritFormatatCuSecunde;
+        }
+        String timpConcretFormatatCuSecunde = timpConcret.format(formatter);
+        return this.model + " - " + this.id + " - " + this.locatiePlecare + " - " + this.destinatie + " - " + this.status + " - " + timpDoritFormatatCuSecunde + " - " + timpConcretFormatatCuSecunde;
     }
 }
+

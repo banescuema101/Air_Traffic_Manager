@@ -1,3 +1,4 @@
+package org.example;
 import java.io.PrintWriter;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -79,11 +80,10 @@ public class GestiunePiste {
     public <T extends Airplane> void helperAfisareRunwayInfo(Runway<T> runway, LocalTime timestamp, PrintWriter pw) {
         if (runway != null) {
             // actualizez si aici statusul pistei, pentru ca mi ar ramane pe ocupat,
-            // de la meneuvers !! eu in cadrul metodei de extragere avion din Runway,
+            // de la maneuvers !! eu in cadrul metodei de extragere avion din org.example.Runway,
             // il resetez pe FREE, facand acea comparatie cu timestampul la care se vrea sa se faca urmatoarea
             // extragere, dar aici la afisari, trebuie resetatat din nou!!
-            LocalTime timestampAux = timestamp.plusMinutes(1);
-            if (runway.getStatusPista().equals(StatusRunway.OCCUPIED) && runway.getTimeOccupied().isBefore(timestampAux)) {
+            if (runway.getStatusPista().equals(StatusRunway.OCCUPIED) && runway.getTimpPistaOcupata().isBefore(timestamp)) {
                 runway.setStatusPista(StatusRunway.FREE);
             }
             pw.println(runway.getId() + " - " + runway.getStatusPista());

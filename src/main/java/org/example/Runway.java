@@ -1,4 +1,7 @@
+package org.example;
+
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 enum StatusRunway{
@@ -12,7 +15,7 @@ public class Runway<T extends Airplane> {
     private PriorityQueue<T> coadaAvioane;
     private StatusRunway statusPista;
     // timpul PANA LA CARE este pista ocupata. !!
-    private LocalTime timeOccupied;
+    private LocalTime timpPistaOcupata;
     public Runway() {
 
     }
@@ -64,19 +67,21 @@ public class Runway<T extends Airplane> {
         this.statusPista = statusPista;
     }
 
-    public LocalTime getTimeOccupied() {
-        return timeOccupied;
+    public LocalTime getTimpPistaOcupata() {
+        return timpPistaOcupata;
     }
 
-    public void setTimeOccupied(LocalTime timeOccupied) {
-        this.timeOccupied = timeOccupied;
+    public void setTimpPistaOcupata(LocalTime timpPistaOcupata) {
+        this.timpPistaOcupata = timpPistaOcupata;
     }
 
     public void adaugaAvion(T avion, LocalTime timestamp) throws IncorrectRunwayException {
         if ("Bucharest".equals(avion.getDestinatie()) && "takeoff".equals(this.getUtilizare())
             || !("Bucharest".equals(avion.getDestinatie())) && "landing".equals(this.getUtilizare())) {
             // daca doreste aterizarea dar pista este una de decolare = > arunc exceptie.
-            throw new IncorrectRunwayException(timestamp.toString() + " | The chosen runway for allocating the plane is incorrect");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            String timestampFormatat = timestamp.format(formatter);
+            throw new IncorrectRunwayException(timestampFormatat + " | The chosen runway for allocating the plane is incorrect");
         } else {
             coadaAvioane.offer(avion);
         }
@@ -110,9 +115,9 @@ public class Runway<T extends Airplane> {
         return null;
     }
     public T extrageAvion(LocalTime timestamp) throws UnavailableRunwayException {
-        // nu vreau sa il sterg, doar sa il extrag.
-        LocalTime timestampAux = timestamp.plusMinutes(1);
-        if (this.getStatusPista().equals(StatusRunway.OCCUPIED) && this.getTimeOccupied().isBefore(timestampAux)) {
+        // nu vreau sa il sterg, doar sa il extrag. ( sa ii schimb statusul avionului, statusul pistei
+        // si timpul cat aceasta va fi sau nu ocupata pentru alte manevre.
+        if (this.getStatusPista().equals(StatusRunway.OCCUPIED) && this.getTimpPistaOcupata().isBefore(timestamp)) {
             this.setStatusPista(StatusRunway.FREE);
         }
         if (this.getStatusPista().equals(StatusRunway.FREE)) {
@@ -129,28 +134,36 @@ public class Runway<T extends Airplane> {
                 }
             }
             if (gasit) {
-                if (avionExtras != null && avionExtras.getStatus().equals(Status.WAITING_FOR_LANDING)) {
+                if (avionExtras.getStatus().equals(Status.WAITING_FOR_LANDING)) {
                     avionExtras.setStatus(Status.LANDED);
-                } else if (avionExtras != null && avionExtras.getStatus().equals(Status.WAITING_FOR_TAKEOFF)) {
+                    avionExtras.setTimpConcret(timestamp);
+                } else if (avionExtras.getStatus().equals(Status.WAITING_FOR_TAKEOFF)) {
                     avionExtras.setStatus(Status.DEPARTED);
+                    avionExtras.setTimpConcret(timestamp);
                 }
 
                 this.setStatusPista(StatusRunway.OCCUPIED);
                 // actaulizarea statusului si a timpului pana la care va fi ocupata pista.
                 if (this.getUtilizare().equals("landing")) {
                     LocalTime timestampDelay1 = timestamp.plusMinutes(10);
-                    this.setTimeOccupied(timestampDelay1);
+                    this.setTimpPistaOcupata(timestampDelay1);
+                    System.out.println("timpul pana la care e ocupata pista de aterizare este: " + timestampDelay1);
                 } else if (this.getUtilizare().equals("takeoff")) {
                     LocalTime timestampDelay2 = timestamp.plusMinutes(5);
-                    this.setTimeOccupied(timestampDelay2);
+                    this.setTimpPistaOcupata(timestampDelay2);
+                    System.out.println("timpul pana la care e ocupata pista de decolare este: " + timestampDelay2);
                 }
                 return avionExtras;
             }
         } else {
             // daca practic au trecut cele 5/10 minute in care pista a fost ocupata
             // ii vom actualiza statusul.
-            throw new UnavailableRunwayException(timestamp);
+            // inseamna ca e ocupata, si timpul de ocupare vreau sa fie acum si el actualizat.
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            String timestampFormatatCuSecunde =  timestamp.format(formatter);
+            throw new UnavailableRunwayException(timestampFormatatCuSecunde  + " | " + "The chosen runway for maneuver is currently occupied");
         }
         return null;
     }
 }
+

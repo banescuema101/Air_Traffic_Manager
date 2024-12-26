@@ -1,3 +1,5 @@
+package org.example;
+
 import java.util.Comparator;
 
 public class RunwayComparatorLanding <T extends Airplane> implements Comparator<T> {
