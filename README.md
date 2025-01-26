@@ -26,7 +26,8 @@ Additionally, a HashMap<String, Airplane> flightsMap is used to keep track of fl
 ## Bonus Part:
 For the bonus part, I implemented commands that allow modifying a flight’s status:
 
-timestamp change_flight delay id_flight id_runway timestamp: Changes the flight’s delay status.
-timestamp change_flight cancel id_flight id_runway: Cancels the flight.
-timestamp change_flight move id_flight id_runway id_new_runway: Moves the flight to a new runway, if compatible with its type (wide/narrow body) and operation (landing/takeoff).
+# timestamp change_flight delay id_flight id_runway timestamp: Changes the flight’s delay status.
+# timestamp change_flight cancel id_flight id_runway: Cancels the flight.
+# timestamp change_flight move id_flight id_runway id_new_runway: Moves the flight to a new runway, if compatible with its type (wide/narrow body) and operation (landing/takeoff).
+#
 # These operations allow for more dynamic control over the flights and runways, simulating real-time airport operations.
