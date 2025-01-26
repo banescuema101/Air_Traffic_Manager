@@ -1,5 +1,6 @@
 ## Introduction:
 This is a Java project for Object-Oriented Programming (OOP), where I have applied various OOP principles such as inheritance, polymorphism, and encapsulation. The project also uses concepts like generics, collections, and exceptions. It models airplanes and runways and includes functionality for managing airplane statuses, runway operations, and flight management. The primary aim is to demonstrate the use of OOP techniques in a practical system for managing air traffic at an airport. The project also includes automated tests to ensure the functionality and correctness of the system.
+# It can be run by executing the command `gradle test`
 
 ## Airplane Class:
 This class models airplanes with the attributes specified in the prompt. The status is initialized based on the destination location. If the destination is Bucharest, the airplane’s status is set to WAITING_FOR_LANDING, otherwise, it is set to WAITING_FOR_TAKEOFF.
