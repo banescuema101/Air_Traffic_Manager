@@ -5,42 +5,42 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-// statusul Pistei.
+// Runway status
 enum StatusRunway{
     FREE,
     OCCUPIED
 }
 
 /**
- * Clasa care reprezinta pista ce contine o coada de avioane, in cadrul pistei avand voie
- * sa lucrez doar cu parametrul T.
- * @param <T> Este un tip de date care extinde clasa {@link Airplane} (adica poate fi in cazul nostru:
- *           {@link WideBodyAirplane} sau {@link NarrowBodyAirplane})
- */
+* Class representing a runway that contains a queue of airplanes, where I am allowed
+* to work only with the parameter T.
+* @param <T> A data type that extends the {@link Airplane} class (in our case, it can be:
+*           {@link WideBodyAirplane} or {@link NarrowBodyAirplane})
+*/
 public class Runway<T extends Airplane> {
     private String id;
-    private String utilizare;
-    private PriorityQueue<T> coadaAvioane;
-    private StatusRunway statusPista;
-    // timpul PANA LA CARE este pista ocupata.
-    private LocalTime timpPistaOcupata;
+    private String usage;
+    private PriorityQueue<T> airplaneQueue;
+    private StatusRunway runwayStatus;
+    // time until which the runway is occupied (if it is occupied)
+    private LocalTime runwayOccupiedTime;
 
     /**
-     * Constructorul pistei de avioane
-     * @param id id-ul asociat pistei
-     * @param utilizare pentru ce este aceasta utilizata: landing / takeoff.
-     * @param tipAvionAcceptat tipul de avion pe care il accepta.
-     * @param comparator Un comparator, de tip Comparator<T>, eu ulterior facand doua clase
-     *                   {@link RunwayComparatorLanding} cu criteriile de comparare pe baza careia voi mentine
-     *                   elementele in coada de avioane pentru o pista de aterizare, respectiv
-     *                   {@link RunwayComparatorTakeoff} cu criterii pt pistele de decolare.
-     * Asignez cu FREE statusul pistei, pentru inceput.
-     */
-    public Runway(String id, String utilizare, String tipAvionAcceptat, Comparator<T> comparator) {
+    * Airplane runway constructor
+    * @param id the ID associated with the runway
+    * @param usage what it is used for: landing / takeoff.
+    * @param acceptedAirplaneType the type of airplane it accepts.
+    * @param comparator A comparator of type Comparator<T>, for which I later create two classes:
+    *                   {@link RunwayComparatorLanding} with the comparison criteria based on which
+    *                   I will maintain the elements in the airplane queue for a landing runway, and
+    *                   {@link RunwayComparatorTakeoff} with criteria for takeoff runways.
+    * Initially, I assign the runway status as FREE.
+    */
+    public Runway(String id, String usage, String acceptedAirplaneType, Comparator<T> comparator) {
         this.id = id;
-        this.utilizare = utilizare;
-        this.coadaAvioane = new PriorityQueue<>(comparator);
-        this.statusPista = StatusRunway.FREE;
+        this.usage = usage;
+        this.airplaneQueue = new PriorityQueue<>(comparator);
+        this.runwayStatus = StatusRunway.FREE;
     }
 
     public String getId() {
@@ -51,180 +51,180 @@ public class Runway<T extends Airplane> {
         this.id = id;
     }
 
-    public String getUtilizare() {
-        return utilizare;
+    public String getUsage() {
+        return usage;
     }
 
-    public void setUtilizare(String utilizare) {
-        this.utilizare = utilizare;
+    public void setUsage(String usage) {
+        this.usage = usage;
     }
 
-    public PriorityQueue<T> getCoadaAvioane() {
-        return coadaAvioane;
+    public PriorityQueue<T> getAirplaneQueue() {
+        return airplaneQueue;
     }
 
-    public void setCoadaAvioane(PriorityQueue<T> coadaAvioane) {
-        this.coadaAvioane = coadaAvioane;
+    public void setAirplaneQueue(PriorityQueue<T> airplaneQueue) {
+        this.airplaneQueue = airplaneQueue;
     }
 
-    public StatusRunway getStatusPista() {
-        return statusPista;
+    public StatusRunway getRunwayStatus() {
+        return runwayStatus;
     }
 
-    public void setStatusPista(StatusRunway statusPista) {
-        this.statusPista = statusPista;
+    public void setRunwayStatus(StatusRunway runwayStatus) {
+        this.runwayStatus = runwayStatus;
     }
 
-    public LocalTime getTimpPistaOcupata() {
-        return timpPistaOcupata;
+    public LocalTime occupiedRunwayTime() {
+        return runwayOccupiedTime;
     }
 
-    public void setTimpPistaOcupata(LocalTime timpPistaOcupata) {
-        this.timpPistaOcupata = timpPistaOcupata;
+    public void setRunwayOccupiedTime(LocalTime runwayOccupiedTime) {
+        this.runwayOccupiedTime = runwayOccupiedTime;
     }
 
     /**
-     * Metoda care adauga un avion in coada de avioane a pistei, verificand conditiile de apartenenta
-     * a avionului la tipul de utilizare a pistei. Daca nu se verifica => se arunca exceptie.
-     * @param avion Avionul de tip Airplane pe care doresc sa il adaug il coada pistei.
-     * @param timestamp Timestampul la care a fost executata comanda, pentru a o afisa in caz ca mi se
-     *                  arunca exceptie (daca doreste aterizarea dar pista este una de decolare)
-     * @throws IncorrectRunwayException exceptie in caz ca utilizarea pistei (decolare/aterizare) nu coincide
-     *                                  cu utilizarea practica a avionului (daca acesta aterizeaza/decoleaza).
-     */
-    public void adaugaAvion(T avion, LocalTime timestamp) throws IncorrectRunwayException {
-        if ("Bucharest".equals(avion.getDestinatie()) && "takeoff".equals(this.getUtilizare())
-            || !("Bucharest".equals(avion.getDestinatie())) && "landing".equals(this.getUtilizare())) {
+    * Method that adds an airplane to the runway's airplane queue, checking the conditions
+    * for the airplane's compatibility with the runway's usage type. If the conditions are not met => an exception is thrown.
+    * @param airplane The airplane of type Airplane that I want to add to the runway's queue.
+    * @param timestamp The timestamp when the command was executed, to display it in case
+    *                  an exception is thrown (e.g., if the airplane wants to land but the runway is for takeoff).
+    * @throws IncorrectRunwayException Exception thrown if the runway's usage (takeoff/landing) does not match
+    *                                  the practical usage of the airplane (whether it is landing/taking off).
+    */
+    public void addAirplane(T airplane, LocalTime timestamp) throws IncorrectRunwayException {
+        if ("Bucharest".equals(airplane.getDestination()) && "takeoff".equals(this.getUsage())
+            || !("Bucharest".equals(airplane.getDestination())) && "landing".equals(this.getUsage())) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
             String timestampFormatat = timestamp.format(formatter);
             throw new IncorrectRunwayException(timestampFormatat + " | The chosen runway for allocating the plane is incorrect");
         } else {
-            coadaAvioane.offer(avion);
+            airplaneQueue.offer(airplane);
         }
     }
 
-    // pt BONUS.
+
     /**
-     * Metoda care modifica timestampul unui avion cu un anume id, din cadrul cozii de avioane
-     * din cadrul pistei
-     * @param idAvion id-ul avionului caruia ii fac actualizarea timestampului.
-     * @param newTimestamp noul timestamp dorit.
-     */
-    public void modificaTimestampAvion(String idAvion, LocalTime newTimestamp){
-        PriorityQueue<T> auxQueue = new PriorityQueue<>(coadaAvioane);
+    * Method that updates the timestamp of an airplane with a specific ID from the airplane queue
+    * on the runway.
+    * @param airplaneId the ID of the airplane whose timestamp is being updated.
+    * @param newTimestamp the new desired timestamp.
+    */
+    public void modificaTimestampAvion(String airplaneId, LocalTime newTimestamp){
+        PriorityQueue<T> auxQueue = new PriorityQueue<>(airplaneQueue);
         while(!auxQueue.isEmpty()) {
-            // potentialul avion dorit.
-            T avion = auxQueue.poll();
-            if (avion.getId().equals(idAvion)) {
-                // il elimin
-                coadaAvioane.remove(avion);
-                // actualizez statusul avionului
-                avion.setTimpDorit(newTimestamp);
-                // il introduc la loc in coada pistei Runway.
-                coadaAvioane.offer(avion);
+            // the airplane I want to modify
+            T airplane = auxQueue.poll();
+            if (airplane.getId().equals(airplaneId)) {
+                // I remove it from the runway's airplane queue
+                airplaneQueue.remove(airplane);
+                // I update its desired time
+                airplane.setDesiredTime(newTimestamp);
+                // I reinsert it into the runway's airplane queue
+                airplaneQueue.offer(airplane);
             }
         }
     }
 
     /**
-     * Metoda are rolul de a modifica corespunzator statusul avionului care merge sa fie manevrat
-     * in functie de criteriile urmatoare:
-     * 1) Daca statusul pistei este pe moment OCUPPIED, insa timpul pana la care este ocupata a expirat,
-     * adica timpul "timpPistaOcupata" este inaintea timestampul la care s-a executat comanda permission_for_maneuver
-     * voi asigna statusul FREE pistei.
-     * 2) Daca pista e FREE:
-     *      Extrag din coada de avioane (folosind o coada auxiliara, din care tot scot elementele) primul avion
-     *      care ARE STATUSUL WAITING_FOR_LANDING SAU WAITING_FOR_TAKEOFF. Daca il exista, atunci ii modific
-     *      statusul ( LANDED/DEPARTED) si setez si timpulConcret cu timpul la care s-a executat manevra.
-     *      De asemenea, actualizez si timpul pana la care pista va fi ocupata ( 5/10 minute in functie de
-     *      ce tip de pista e.)
-     * 3)   In caz ca pista are statusul OCCUPIED arunc exceptia {@link UnavailableRunwayException}, care va contine ca
-     * mesaj timestampul la care s-a incercat executarea manevrei cat si mesajul de eroare ca pista este
-     * ocupata.
-     * @param timestamp Ora la care se executa comanda de permission_for_maneuver
-     * @throws UnavailableRunwayException daca pista este ocupata in acel moment.
-     */
-    public void extrageAvion(LocalTime timestamp) throws UnavailableRunwayException {
-        // nu vreau sa il sterg, doar sa il "extrag". (sa ii schimb statusul avionului, statusul pistei
-        // si timpul cat aceasta va fi sau nu ocupata pentru alte manevre.
-        if (this.getStatusPista().equals(StatusRunway.OCCUPIED) && this.getTimpPistaOcupata().isBefore(timestamp)) {
-            this.setStatusPista(StatusRunway.FREE);
+    * The method is responsible for appropriately modifying the status of the airplane that is about to be maneuvered
+    * based on the following criteria:
+    * 1) If the runway status is currently OCCUPIED, but the time until which it is occupied has expired,
+    * meaning the "runwayOccupiedTime" is before the timestamp at which the permission_for_maneuver command was executed,
+    * I will assign the status FREE to the runway.
+    * 2) If the runway is FREE:
+    *      I extract from the airplane queue (using an auxiliary queue, from which I keep removing elements) the first airplane
+    *      that HAS THE STATUS WAITING_FOR_LANDING OR WAITING_FOR_TAKEOFF. If it exists, then I modify
+    *      its status (LANDED/DEPARTED) and also set the actualTime to the time at which the maneuver was executed.
+    *      Additionally, I update the time until which the runway will be occupied (5/10 minutes depending on
+    *      the type of runway).
+    * 3)   If the runway status is OCCUPIED, I throw the exception {@link UnavailableRunwayException}, which will contain as
+    * a message the timestamp at which the maneuver attempt was made and the error message that the runway is
+    * occupied.
+    * @param timestamp The time at which the permission_for_maneuver command is executed.
+    * @throws UnavailableRunwayException if the runway is occupied at that moment.
+    */
+    public void airplaneExtraction(LocalTime timestamp) throws UnavailableRunwayException {
+        // I don't want to delete it, just "extract" it (change the airplane's status, the runway's status,
+        // and the time for which it will or will not be occupied for other maneuvers).
+        if (this.getRunwayStatus().equals(StatusRunway.OCCUPIED) && this.occupiedRunwayTime().isBefore(timestamp)) {
+            this.setRunwayStatus(StatusRunway.FREE);
         }
-        if (this.getStatusPista().equals(StatusRunway.FREE)) {
-            // creez o coada auxiliara din care tot voi extrage elementele in ordinea prioritatii
-            // aferente cozii "coadaAvioane".
-            PriorityQueue<T> auxQueue = new PriorityQueue<>(coadaAvioane);
-            T avionExtras = null;
-            boolean gasit = false;
+        if (this.getRunwayStatus().equals(StatusRunway.FREE)) {
+            // create an auxiliary queue from which I will extract elements in the priority order
+            // corresponding to the "airplaneQueue".
+            PriorityQueue<T> auxQueue = new PriorityQueue<>(airplaneQueue);
+            T extractedAirplane = null;
+            boolean found = false;
             while(!auxQueue.isEmpty()) {
                 T airplane = auxQueue.poll();
-                System.out.println("testare-extragere-avion:" + airplane);
+                System.out.println("airplane-extraction-test:" + airplane);
                 if (!airplane.getStatus().equals(Status.LANDED) && !airplane.getStatus().equals(Status.DEPARTED)) {
-                    avionExtras = airplane;
-                    gasit = true;
+                    extractedAirplane = airplane;
+                    found = true;
                     break;
                 }
             }
-            if (gasit) {
-                if (avionExtras.getStatus().equals(Status.WAITING_FOR_LANDING)) {
-                    avionExtras.setStatus(Status.LANDED);
-                    avionExtras.setTimpConcret(timestamp);
-                } else if (avionExtras.getStatus().equals(Status.WAITING_FOR_TAKEOFF)) {
-                    avionExtras.setStatus(Status.DEPARTED);
-                    avionExtras.setTimpConcret(timestamp);
+            if (found) {
+                if (extractedAirplane.getStatus().equals(Status.WAITING_FOR_LANDING)) {
+                    extractedAirplane.setStatus(Status.LANDED);
+                    extractedAirplane.setActualTime(timestamp);
+                } else if (extractedAirplane.getStatus().equals(Status.WAITING_FOR_TAKEOFF)) {
+                    extractedAirplane.setStatus(Status.DEPARTED);
+                    extractedAirplane.setActualTime(timestamp);
                 }
 
-                this.setStatusPista(StatusRunway.OCCUPIED);
-                // actualizarea statusului si a timpului pana la care va fi ocupata pista.
-                if (this.getUtilizare().equals("landing")) {
+                this.setRunwayStatus(StatusRunway.OCCUPIED);
+                // updating the status and the time until the runway will be occupied
+                if (this.getUsage().equals("landing")) {
                     LocalTime timestampDelay1 = timestamp.plusMinutes(10);
-                    this.setTimpPistaOcupata(timestampDelay1);
-                    System.out.println("timpul pana la care e ocupata pista de aterizare este: " + timestampDelay1);
-                } else if (this.getUtilizare().equals("takeoff")) {
+                    this.setRunwayOccupiedTime(timestampDelay1);
+                    System.out.println("The time until which the landing runway is occupied is: " + timestampDelay1);
+                } else if (this.getUsage().equals("takeoff")) {
                     LocalTime timestampDelay2 = timestamp.plusMinutes(5);
-                    this.setTimpPistaOcupata(timestampDelay2);
-                    System.out.println("timpul pana la care e ocupata pista de decolare este: " + timestampDelay2);
+                    this.setRunwayOccupiedTime(timestampDelay2);
+                    System.out.println("The time until which the takeoff runway is occupied is: " + timestampDelay2);
                 }
             }
         } else {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-            String timestampFormatatCuSecunde =  timestamp.format(formatter);
-            throw new UnavailableRunwayException(timestampFormatatCuSecunde  + " | " + "The chosen runway for maneuver is currently occupied");
+            String formattedTimestampWithSeconds =  timestamp.format(formatter);
+            throw new UnavailableRunwayException(formattedTimestampWithSeconds  + " | " + "The chosen runway for maneuver is currently occupied");
         }
     }
 
     /**
-     * PT. BONUS:
-     * Metoda care imi sterge un avion cu id-ul primit ca parametru.
-     * Creez coada auxiliara cu elementele din coada {@link Runway#coadaAvioane} si extrag unul cate unul
-     * pana cand ajung la avionul cu id-ul dorit. Atunci il voi elimina din coada de avioane
-     * @param idAvion id-ul avionului de sters.
-     */
-    public void stergeAvion(String idAvion) {
-        PriorityQueue<T> auxQueue = new PriorityQueue<>(coadaAvioane);
+    * FOR BONUS:
+    * Method that deletes an airplane with the given ID.
+    * I create an auxiliary queue with the elements from the {@link Runway#airplaneQueue} queue and extract them one by one
+    * until I reach the airplane with the desired ID. Then I will remove it from the airplane queue.
+    * @param airplaneId the ID of the airplane to delete.
+    */
+    public void deleteAirplane(String airplaneId) {
+        PriorityQueue<T> auxQueue = new PriorityQueue<>(airplaneQueue);
         while (!auxQueue.isEmpty()) {
-            T avion = auxQueue.poll();
-            if (avion.getId().equals(idAvion)) {
-                this.coadaAvioane.remove(avion);
+            T airplane = auxQueue.poll();
+            if (airplane.getId().equals(airplaneId)) {
+                this.airplaneQueue.remove(airplane);
             }
         }
     }
 
     /**
-     * Metoda toString in care afisez:
-     * @return id-ul pistei (pe linie separata), si apoi pe fiecare linie, avioanele din coada
-     * coada fiind deja sortata, intrucat e de prioritate, cu comparatorul specificat la creare.
-     */
+    * toString method where I display:
+    * @return the runway ID (on a separate line), and then on each line, the airplanes in the queue,
+    * the queue being already sorted, as it is a priority queue, with the comparator specified at creation.
+    */
     public String toString() {
-        StringBuilder sir = new StringBuilder();
-        sir.append(this.id);
-        sir.append("\n");
-        PriorityQueue<T> auxQueue = new PriorityQueue<>(coadaAvioane);
+        StringBuilder string = new StringBuilder();
+        string.append(this.id);
+        string.append("\n");
+        PriorityQueue<T> auxQueue = new PriorityQueue<>(airplaneQueue);
         while (!auxQueue.isEmpty()) {
-            sir.append(auxQueue.poll().toString());
-            sir.append("\n");
+            string.append(auxQueue.poll().toString());
+            string.append("\n");
         }
-        return sir.toString();
+        return string.toString();
     }
 }
 

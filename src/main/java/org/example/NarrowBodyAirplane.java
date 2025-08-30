@@ -3,17 +3,17 @@ package org.example;
 import java.time.LocalTime;
 
 public class NarrowBodyAirplane extends Airplane {
-    // constructorul avionului de tip NarrowBody, in care practic voi apela constructorul superclasei, adica
-    // al clasei Airplane.
-    public NarrowBodyAirplane(String model, String id, String locatiePlecare, String destinatie, LocalTime timpDorit, String urgent) {
-        super("narrow", model, id, locatiePlecare, destinatie, timpDorit, urgent);
+    // Constructor for the NarrowBody airplane, where I essentially call the superclass constructor,
+    // which is the constructor of the Airplane class.
+    public NarrowBodyAirplane(String model, String id, String departureLocation, String destination, LocalTime desiredTime, String urgentFlag) {
+        super("narrow", model, id, departureLocation, destination, desiredTime, urgentFlag);
     }
 
     /**
-     * Metoda in care suprascriu metoda toString a superclasei, specificand in fata ca
-     * prim argument, tipul avionului ( Narrow Body).
-     * @return descrierea obiectului.
-     */
+    * Method in which I override the toString method of the superclass, specifying
+    * as the first argument the type of the airplane (Narrow Body).
+    * @return the description of the object.
+    */
     public String toString() {
         return "Narrow Body - " + super.toString();
     }

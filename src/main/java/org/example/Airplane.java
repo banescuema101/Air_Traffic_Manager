@@ -3,7 +3,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.LocalTime;
 
 /**
- * Statusurile pe care le poate lua un avion.
+    * The statuses an airplane can have.
  */
 enum Status {
     WAITING_FOR_TAKEOFF,
@@ -12,49 +12,49 @@ enum Status {
     LANDED
 }
 public abstract class Airplane {
-    private String tip; // poate fi "narrow" sau "wide", initializat in clasele mai specifice.;
+    private String type; // can be "narrow" or "wide", initialized in more specific classes.
     private String model;
-    private String urgent;
+    private String urgentFlag;
     private String id;
-    private String locatiePlecare;
-    private String destinatie;
-    // orele de tip LocalTime, pe care le-am formatat mai apoi, cu ajutorul DateTimeFormatter,
-    // respectiv le-am parsat din clasele Main si Runway cu ajutorul metodei
+    private String departureLocation;
+    private String destination;
+    // The times are of type LocalTime, which I later formatted using DateTimeFormatter,
+    // and parsed in the Main and Runway classes using the method
     // LocalTime.parse(String..., DateTimeFormatter ...)
-    private LocalTime timpDorit;
-    // timpul concret se va asigna in clasa Runway, atunci cand fac extragerea avionului
-    // din coada de avioane a unei piste. Momentan el nu este asignat in constructorul lui Airplane.
-    private LocalTime timpConcret;
+    private LocalTime desiredTime;
+    // The actual time will be assigned in the Runway class when extracting the airplane
+    // from the queue of airplanes on a runway. Currently, it is not assigned in the Airplane constructor.
+    private LocalTime actualTime;
     private Status status;
 
     /**
-     * Contructorul pentru un avion
-     * @param tip tip-ul avionului wide sau narrow.
-     * @param model modelul avionului pe care il atribui campului aferent.
-     * @param id id-ul asociat avioanului.
-     * @param locatiePlecare locatia de placare, de tip String. Daca este "Bucharest" => este avion
-     *                       ce doreste sa decoleze. Statusul il asignez corespunzator.
-     * @param destinatie    destinatia zborului. Daca este "Bucharest" => este avion ce doreste sa
-     *                      aterizeze. Statusul il asignez corespunzator.
-     * @param timpDorit timpul la care se anticipeaza
-     * @param urgent camp care poate fi null => atributul urgent al claei avion ramane tot pe null => nu are
-     *               nicio urgenta.
-     *               camp care poate fi stringul "urgent" => inseamna ca avionul are o urgenta si va fi tratat
-     *               ca atare ulterior.
-     */
-    public Airplane(String tip, String model, String id, String locatiePlecare, String destinatie, LocalTime timpDorit, String urgent) {
-        if (urgent != null) {
-            this.urgent = urgent;
+    * Constructor for an airplane
+    * @param type the type of the airplane, either wide or narrow.
+    * @param model the model of the airplane, assigned to the corresponding field.
+    * @param id the ID associated with the airplane.
+    * @param departureLocation the departure location, of type String. If it is "Bucharest" => it is an airplane
+    *                          that wants to take off. The status is assigned accordingly.
+    * @param destination the destination of the flight. If it is "Bucharest" => it is an airplane that wants to
+    *                    land. The status is assigned accordingly.
+    * @param desiredTime the time at which it is anticipated.
+    * @param urgentFlag a field that can be null => the urgentFlag attribute of the airplane class remains null => it has
+    *                   no urgency.
+    *                   a field that can be the string "urgentFlag" => means the airplane has an urgency and will be treated
+    *                   accordingly later.
+    */
+    public Airplane(String type, String model, String id, String departureLocation, String destination, LocalTime desiredTime, String urgentFlag) {
+        if (urgentFlag != null) {
+            this.urgentFlag = urgentFlag;
         }
-        this.tip = tip;
+        this.type = type;
         this.model = model;
         this.id = id;
-        this.locatiePlecare = locatiePlecare;
-        this.destinatie = destinatie;
-        this.timpDorit = timpDorit;
-        if (locatiePlecare.equals("Bucharest")) {
+        this.departureLocation = departureLocation;
+        this.destination = destination;
+        this.desiredTime = desiredTime;
+        if (departureLocation.equals("Bucharest")) {
             status = Status.WAITING_FOR_TAKEOFF;
-        } else if (destinatie.equals("Bucharest")) {
+        } else if (destination.equals("Bucharest")) {
             status = Status.WAITING_FOR_LANDING;
         }
     }
@@ -65,11 +65,11 @@ public abstract class Airplane {
     public void setModel(String model) {
         this.model = model;
     }
-    public String getTip() {
-        return tip;
+    public String getType() {
+        return type;
     }
-    public void setTip(String tip) {
-        this.tip = tip;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getId() {
@@ -80,36 +80,36 @@ public abstract class Airplane {
         this.id = id;
     }
 
-    public String getLocatiePlecare() {
-        return locatiePlecare;
+    public String getDepartureLocation() {
+        return departureLocation;
     }
 
-    public void setLocatiePlecare(String locatiePlecare) {
-        this.locatiePlecare = locatiePlecare;
+    public void setDepartureLocation(String departureLocation) {
+        this.departureLocation = departureLocation;
     }
 
-    public String getDestinatie() {
-        return destinatie;
+    public String getDestination() {
+        return destination;
     }
 
-    public void setDestinatie(String destinatie) {
-        this.destinatie = destinatie;
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 
-    public LocalTime getTimpDorit() {
-        return timpDorit;
+    public LocalTime getDesiredTime() {
+        return desiredTime;
     }
 
-    public void setTimpDorit(LocalTime timpDorit) {
-        this.timpDorit = timpDorit;
+    public void setDesiredTime(LocalTime desiredTime) {
+        this.desiredTime = desiredTime;
     }
 
-    public LocalTime getTimpConcret() {
-        return timpConcret;
+    public LocalTime getActualTime() {
+        return actualTime;
     }
 
-    public void setTimpConcret(LocalTime timpConcret) {
-        this.timpConcret = timpConcret;
+    public void setActualTime(LocalTime actualTime) {
+        this.actualTime = actualTime;
     }
 
     public Status getStatus() {
@@ -119,33 +119,33 @@ public abstract class Airplane {
     public void setStatus(Status status) {
         this.status = status;
     }
-    public String getUrgent() {
-        return urgent;
+    public String getUrgentFlag() {
+        return urgentFlag;
     }
 
-    public void setUrgent(String urgent) {
-        this.urgent = urgent;
+    public void setUrgentFlag(String urgentFlag) {
+        this.urgentFlag = urgentFlag;
     }
 
     /**
-     * Metoda toString, care returneaza reprezentarea avionului, in doua cazuri:
-     * @return Caz 1) daca timpul concret este null => avionul aterizeaza/decoleaza la ora dorita
-     * data initial in fisierul de input din Main. Atunci voi afisa toate atributele clasei acestea, in afara
-     * de atributul timpConcret.
-     *         Caz 2) daca timpulConret este asignat => voi adauga la retur si valoarea acestuia
-     *
-     * In ambele cazuri, am formatat data pentru a o afisa cu delimitatorul ":" intre ora:minut:secunde
-     * Si de asemenea, daca nu o formatam asa, nu imi afisa partea de secunde mereu ( ex: daca ora era:
-     * 13:45:00 => mi se afisa 13:45)
-     */
+    * The toString method, which returns the representation of the airplane in two cases:
+    * @return Case 1) if the actual time is null => the airplane lands/takes off at the desired time
+    * initially provided in the input file from Main. In this case, all attributes of this class are displayed,
+    * except for the actualTime attribute.
+    *         Case 2) if the actual time is assigned => the return will also include its value.
+    *
+    * In both cases, the time is formatted to display with the ":" delimiter between hour:minute:seconds.
+    * Additionally, if not formatted this way, the seconds part would not always display (e.g., if the time was
+    * 13:45:00 => it would display as 13:45).
+    */
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        String timpDoritFormatatCuSecunde = timpDorit.format(formatter);
-        if (timpConcret == null) {
-            return this.model + " - " + this.id + " - " + this.locatiePlecare + " - " + this.destinatie + " - " + this.status + " - " + timpDoritFormatatCuSecunde;
+        String desiredTimeFormattedWithSeconds = desiredTime.format(formatter);
+        if (actualTime == null) {
+            return this.model + " - " + this.id + " - " + this.departureLocation + " - " + this.destination + " - " + this.status + " - " + desiredTimeFormattedWithSeconds;
         }
-        String timpConcretFormatatCuSecunde = timpConcret.format(formatter);
-        return this.model + " - " + this.id + " - " + this.locatiePlecare + " - " + this.destinatie + " - " + this.status + " - " + timpDoritFormatatCuSecunde + " - " + timpConcretFormatatCuSecunde;
+        String actualTimeFormattedWithSeconds = actualTime.format(formatter);
+        return this.model + " - " + this.id + " - " + this.departureLocation + " - " + this.destination + " - " + this.status + " - " + desiredTimeFormattedWithSeconds + " - " + actualTimeFormattedWithSeconds;
     }
 }
 

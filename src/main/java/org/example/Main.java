@@ -12,174 +12,172 @@ import java.time.format.DateTimeFormatter;
 public class Main {
     public static void main(String[] args) throws IOException {
         if (args.length > 0) {
-            // antetul fisierelor pe care le voi folosi ca intrare/iesire.
-            String antetResources = "src/main/resources/";
-            String fisierIntrare = antetResources + args[0] + "/" + "input.in";
-            String fisierExceptii = antetResources + args[0] + "/"+ "board_exceptions.out";
-            String fisierOut = antetResources + args[0] + "/" + "flight_info.out";
+            // The header of the files that I will use as input/output.
+            String resourcesHeader = "src/main/resources/";
+            String inputFile = resourcesHeader + args[0] + "/" + "input.in";
+            String exceptionsFile = resourcesHeader + args[0] + "/"+ "board_exceptions.out";
+            String outputFile = resourcesHeader + args[0] + "/" + "flight_info.out";
             try {
-                // fisierul in care voi SCRIE exceptiile de tip IncorrectRunway si UnavailableRunway line by line.
-                FileWriter fw = new FileWriter(fisierExceptii, true);
-                PrintWriter pwExceptii = new PrintWriter(fw);
-                // file ul de intrare, din care CITESC informatiile.
-                FileReader fr = new FileReader(fisierIntrare);
+                // The file in which I will WRITE exceptions of type IncorrectRunway and UnavailableRunway line by line.
+                FileWriter fw = new FileWriter(exceptionsFile, true);
+                PrintWriter pwForExceptions = new PrintWriter(fw);
+                // The input file, from which I READ the information.
+                FileReader fr = new FileReader(inputFile);
                 BufferedReader br = new BufferedReader(fr);
-                // fisierul de iesire in care scriu outputul comenzii flights_info: flights_info.out.
-                FileWriter fwOut = new FileWriter(fisierOut, true);
+                // The output file where I write the output of the flights_info command: flights_info.out.
+                FileWriter fwOut = new FileWriter(outputFile, true);
                 PrintWriter pwOut = new PrintWriter(fwOut);
-                String linie;
-                // un formatter de tip ora:minut:secunde
+                String line;
+                // a formatter of type hour:minute:seconds
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-                GestiunePiste gestiunePiste = new GestiunePiste();
-                // verific ca reusesc sa fac citirea liniei, cat si faptul CA NU E GOAALA doar cu
-                // trailing space-uri...
-                while ((linie = br.readLine()) != null && !linie.isEmpty()) {
-                    String[] textLinie = linie.split(" - ");
-                    String comanda = textLinie[1];
-                    String sirCuTimpul = textLinie[0];
-                    // creez un abiect de tip LocalTime, din Stringul timestamp primit de la input,
-                    // formatat corespunzator.
-                    LocalTime timestamp = LocalTime.parse(sirCuTimpul, formatter);
-                    switch (comanda) {
+                RunwayManagement runwayManagement = new RunwayManagement();
+                // I check that I can read the line and that it is NOT EMPTY, only with trailing spaces...
+                while ((line = br.readLine()) != null && !line.isEmpty()) {
+                    String[] lineStringsList = line.split(" - ");
+                    String command = lineStringsList[1];
+                    String timeString = lineStringsList[0];
+                    // I create a LocalTime object from the timestamp String received as input,
+                    // formatted accordingly.
+                    LocalTime timestamp = LocalTime.parse(timeString, formatter);
+                    switch (command) {
                         case "add_runway_in_use":
-                            // prieau parametrii.
-                            String id = textLinie[2];
-                            String utilizare = textLinie[3];
-                            String tipAvionAcceptat = textLinie[4];
-                            // conteaza pentru mine in primul rand daca adaug pista in mapul de piste cu avioane
-                            // de tip wide body sau narrow body, si pentru fiecare din aceste doua cazuri, va conta
-                            // si daca pista este de decolare sau de aterizare, d.p.d.v al comparatorului folosit
-                            // pt a mentine prioritatea corecta in cadrul cozii de avioane.
-                            if (tipAvionAcceptat.equals("wide body")) {
-                                if (utilizare.equals("landing")) {
-                                    Runway<WideBodyAirplane> runway = new Runway<>(id, utilizare, tipAvionAcceptat, new RunwayComparatorLanding<>());
-                                    gestiunePiste.addToWideList(runway);
-                                } else if(utilizare.equals("takeoff")) {
-                                    Runway<WideBodyAirplane> runway = new Runway<>(id, utilizare, tipAvionAcceptat, new RunwayComparatorTakeoff<>());
-                                    gestiunePiste.addToWideList(runway);
+                            // I extract the parameters of the command.
+                            String id = lineStringsList[2];
+                            String usage = lineStringsList[3];
+                            String acceptedAirplaneType = lineStringsList[4];
+                            // It is important for me, first of all, to add the runway to the map of runways with airplanes
+                            // of type wide body or narrow body, and for each of these two cases, it will also matter
+                            // whether the runway is for takeoff or landing, from the perspective of the comparator used
+                            // to maintain the correct priority within the airplane queue.
+                            if (acceptedAirplaneType.equals("wide body")) {
+                                if (usage.equals("landing")) {
+                                    Runway<WideBodyAirplane> runway = new Runway<>(id, usage, acceptedAirplaneType, new RunwayComparatorLanding<>());
+                                    runwayManagement.addToWideList(runway);
+                                } else if(usage.equals("takeoff")) {
+                                    Runway<WideBodyAirplane> runway = new Runway<>(id, usage, acceptedAirplaneType, new RunwayComparatorTakeoff<>());
+                                    runwayManagement.addToWideList(runway);
                                 }
-                            } else if (tipAvionAcceptat.equals("narrow body")) {
-                                if (utilizare.equals("landing")) {
-                                    Runway<NarrowBodyAirplane> runway = new Runway<>(id, utilizare, tipAvionAcceptat, new RunwayComparatorLanding<>());
-                                    gestiunePiste.addToNarrowList(runway);
-                                } else if(utilizare.equals("takeoff")) {
-                                    Runway<NarrowBodyAirplane> runway = new Runway<>(id, utilizare, tipAvionAcceptat, new RunwayComparatorTakeoff<>());
-                                    gestiunePiste.addToNarrowList(runway);
+                            } else if (acceptedAirplaneType.equals("narrow body")) {
+                                if (usage.equals("landing")) {
+                                    Runway<NarrowBodyAirplane> runway = new Runway<>(id, usage, acceptedAirplaneType, new RunwayComparatorLanding<>());
+                                    runwayManagement.addToNarrowList(runway);
+                                } else if(usage.equals("takeoff")) {
+                                    Runway<NarrowBodyAirplane> runway = new Runway<>(id, usage, acceptedAirplaneType, new RunwayComparatorTakeoff<>());
+                                    runwayManagement.addToNarrowList(runway);
                                 }
                             }
                             break;
                         case "allocate_plane":
-                            // comanda de alocare a unui avion unei piste cu id-ul id. ( nu mi se spune daca
-                            // contine avioane de tip narrow sau wide, deci voi incerca separat mai intai sa o gasesc
-                            // in mapul cu piste cu avioane de tip wide si apoi de tip narrow. Vad in care o gasesc
-                            // si adaug corespunzator apeland metoda adaugaAvion din clasa Runway, cat si din clasa
-                            // GestiunePiste.
-                            String tipAvion = textLinie[2];
-                            String model = textLinie[3];
-                            String idZbor = textLinie[4];
-                            String plecare = textLinie[5];
-                            String destinatie = textLinie[6];
-                            LocalTime timpDorit = LocalTime.parse(textLinie[7], formatter);
-                            String idPista = textLinie[8];
-                            // urgent poate fi null sau poate exista Stringul "urgent:
-                            // acest lucru este gestionat de constructorul clasei abstracta org.example.Airplane.
-                            String urgent = null;
-                            if (textLinie.length == 10) {
-                                urgent = textLinie[9];
+                            // Command to allocate an airplane to a runway with the given id. (It is not specified
+                            // whether it contains narrow or wide-body airplanes, so I will first try to find it
+                            // in the map of runways with wide-body airplanes and then in the map of runways with
+                            // narrow-body airplanes. I will see where it is found and add it accordingly by calling
+                            // the addAirplane method from the Runway class as well as from the RunwayManagement class.
+                            String airplaneType = lineStringsList[2];
+                            String model = lineStringsList[3];
+                            String flightId = lineStringsList[4];
+                            String departure = lineStringsList[5];
+                            String destination = lineStringsList[6];
+                            LocalTime desiredTime = LocalTime.parse(lineStringsList[7], formatter);
+                            String runwayId = lineStringsList[8];
+                            // urgentFlag can be null or can contain the String "urgentFlag":
+                            // this is handled by the constructor of the abstract class org.example.Airplane.
+                            String urgentFlag = null;
+                            if (lineStringsList.length == 10) {
+                                urgentFlag = lineStringsList[9];
                             }
                             try {
-                                if (tipAvion.equals("wide body")) {
-                                    Runway<WideBodyAirplane> runwayFoundWide = gestiunePiste.findWideRunway(idPista);
-                                    WideBodyAirplane avion = new WideBodyAirplane(model, idZbor, plecare, destinatie, timpDorit, urgent);
-                                    runwayFoundWide.adaugaAvion(avion, timestamp);
-                                    // adaug si in lista de zboruri din clasa GestiunePiste,
-                                    // unde memorez in hashmap-ul ID_ZBOR <-> avion
-                                    gestiunePiste.adaugaZbor(avion);
+                                if (airplaneType.equals("wide body")) {
+                                    Runway<WideBodyAirplane> runwayFoundWide = runwayManagement.findWideRunway(runwayId);
+                                    WideBodyAirplane airplane = new WideBodyAirplane(model, flightId, departure, destination, desiredTime, urgentFlag);
+                                    runwayFoundWide.addAirplane(airplane, timestamp);
+                                    // add to the list of flights in the RunwayManagement class,
+                                    // where I store in the hashmap ID_FLIGHT <-> airplane
+                                    runwayManagement.addFlight(airplane);
                                 } else {
-                                    Runway<NarrowBodyAirplane> runwayFoundNarrow = gestiunePiste.findNarrowRunway(idPista);
-                                    NarrowBodyAirplane avion = new NarrowBodyAirplane(model, idZbor, plecare, destinatie, timpDorit, urgent);
-                                    runwayFoundNarrow.adaugaAvion(avion, timestamp);
-                                    gestiunePiste.adaugaZbor(avion);
+                                    Runway<NarrowBodyAirplane> runwayFoundNarrow = runwayManagement.findNarrowRunway(runwayId);
+                                    NarrowBodyAirplane airplane = new NarrowBodyAirplane(model, flightId, departure, destination, desiredTime, urgentFlag);
+                                    runwayFoundNarrow.addAirplane(airplane, timestamp);
+                                    runwayManagement.addFlight(airplane);
                                 }
                             } catch (IncorrectRunwayException e) {
-                                pwExceptii.println(e.getMessage());
+                                pwForExceptions.println(e.getMessage());
                             }
                             break;
                         case "flight_info":
-                            // Comanda de afisare in fisierul flight_info a informatiilor despre un zbor ( un anume
-                            // avion) cu un anume id. Apelez metoda gasireZborDupaId din instanta clasei
-                            // GestiunePiste.
-                            LocalTime timestampFormatat = LocalTime.parse(textLinie[0], formatter);
-                            String idZborDeAfisat = textLinie[2];
-                            String timestampFormatatCuSecunde = timestampFormatat.format(formatter);
-                            pwOut.println(timestampFormatatCuSecunde + " | " + gestiunePiste.gasireZborDupaId(idZborDeAfisat));
+                            // Command to write flight information about a specific flight (a specific airplane) with a specific id to the flight_info file.
+                            // I call the findFlightById method from the instance of the RunwayManagement class.
+                            LocalTime formattedTimestamp = LocalTime.parse(lineStringsList[0], formatter);
+                            String displayedFlightId = lineStringsList[2];
+                            String timestampFormattedWithSeconds = formattedTimestamp.format(formatter);
+                            pwOut.println(timestampFormattedWithSeconds + " | " + runwayManagement.findFlightById(displayedFlightId));
                             break;
                         case "runway_info":
-                            // Comanda de afisare in fisier a informatiilor unei piste cu un anume id.
-                            // apeland metoda afisareRunwayInfo din clasa GestiunePiste.
-                            String idRunway = textLinie[2];
-                            // creez acum un DateTimeFormatter pentru a crea numele fisierului
-                            // delimitat de "-" intre ora-minut-secunde.
-                            DateTimeFormatter formatterCuLinii = DateTimeFormatter.ofPattern("HH-mm-ss");
-                            LocalTime timestampFormatat1 = LocalTime.parse(textLinie[0], formatter);
-                            // pentru a crea fisierul runway_info_name_ora-minut-secunde.
-                            String timestampFormatatCuSecunde1 = timestampFormatat1.format(formatterCuLinii);
-                            String fisierRunwayInfo = antetResources + args[0] + "/" + "runway_info_" + idRunway + "_" + timestampFormatatCuSecunde1 + ".out";
-                            FileWriter fwRunwayInfo = new FileWriter(fisierRunwayInfo, true);
+                            // Command to display information about a runway with a specific id in a file.
+                            // by calling the displayRunwayInfo method from the RunwayManagement class.
+                            String idRunway = lineStringsList[2];
+                            // I am now creating a DateTimeFormatter to create the file name
+                            // delimited by "-" between hour-minute-seconds.
+                            DateTimeFormatter formatterWithDashes = DateTimeFormatter.ofPattern("HH-mm-ss");
+                            LocalTime formattedTimestamp1 = LocalTime.parse(lineStringsList[0], formatter);
+                            // to create the file runway_info_name_hour-minute-seconds.
+                            String timestampFormattedWithSeconds1 = formattedTimestamp1.format(formatterWithDashes);
+                            String runwayInfoFile = resourcesHeader + args[0] + "/" + "runway_info_" + idRunway + "_" + timestampFormattedWithSeconds1 + ".out";
+                            FileWriter fwRunwayInfo = new FileWriter(runwayInfoFile, true);
                             PrintWriter pwRunwayInfo = new PrintWriter(fwRunwayInfo);
-                            gestiunePiste.afisareRunwayInfo(idRunway, timestamp, pwRunwayInfo);
+                            runwayManagement.displayRunwayInfo(idRunway, timestamp, pwRunwayInfo);
                             pwRunwayInfo.close();
                             break;
                         case "permission_for_maneuver":
-                            // Comanda care executa manevra de aterizare, respectiv decolare, a avionului
-                            // extras cu ajutorul metodei extrageAvion din clasa GestiunePiste.
-                            String idPistaManeuver = textLinie[2];
+                            // Command that executes the landing or takeoff maneuver of the airplane
+                            // extracted using the airplaneExtraction method from the RunwayManagement class.
+                            String runwayIdManeuver = lineStringsList[2];
                             try {
-                                Runway<WideBodyAirplane> runwayWide = gestiunePiste.findWideRunway(idPistaManeuver);
+                                Runway<WideBodyAirplane> runwayWide = runwayManagement.findWideRunway(runwayIdManeuver);
                                 if (runwayWide != null) {
-                                    runwayWide.extrageAvion(timestamp);
+                                    runwayWide.airplaneExtraction(timestamp);
                                 } else {
-                                    Runway<NarrowBodyAirplane> runwayNarrow = gestiunePiste.findNarrowRunway(idPistaManeuver);
-                                    runwayNarrow.extrageAvion(timestamp);
+                                    Runway<NarrowBodyAirplane> runwayNarrow = runwayManagement.findNarrowRunway(runwayIdManeuver);
+                                    runwayNarrow.airplaneExtraction(timestamp);
                                 }
                             } catch (UnavailableRunwayException e) {
-                                pwExceptii.println(e.getMessage());
+                                pwForExceptions.println(e.getMessage());
                             }
                             break;
-                        // comanda noua pt partea de bonus, cu ajutorul careia putem:
-                        // (1) amana timpul de decolare/aterizare a unui anume avion de pe o anume pista.
-                        // (2) anula un anume zbor din cadrul cozii de avioane dintr-o anume pista.
-                        // (3) sa mutam un avion cu un anume id, de pe o o pista cu un anume id, pe alta pista cu alt id.
+                            // New command for the bonus part, with which we can:
+                            // (1) delay the takeoff/landing time of a specific airplane on a specific runway.
+                            // (2) cancel a specific flight from the queue of airplanes on a specific runway.
+                            // (3) move an airplane with a specific id from one runway with a specific id to another runway with a different id.
                         case "change_flight":
-                            // poate fi data sub 3 forme:
-                            // timestamp change_flight delay id_zbor id_pista timestamp
-                            // timestamp change_flight cancel id_zbor id_pista
-                            // timestamp change_flight move id_zbor id_pista id_pista_noua
-                            String actiune = textLinie[2];
-                            String idZborDeSchimbat = textLinie[3];
-                            idPista = textLinie[4];
-                            switch(actiune) {
+                            // It can be given in 3 forms:
+                            // timestamp change_flight delay flight_id runway_id timestamp
+                            // timestamp change_flight cancel flight_id runway_id
+                            // timestamp change_flight move flight_id runway_id new_runway_id
+                            String action = lineStringsList[2];
+                            String flightIdToChange = lineStringsList[3];
+                            runwayId = lineStringsList[4];
+                            switch(action) {
                                 case "delay":
-                                    String sirTimestampSchimbat = textLinie[5];
-                                    LocalTime timestampSchimbat = LocalTime.parse(sirTimestampSchimbat, formatter);
+                                    String changedTimestampString = lineStringsList[5];
+                                    LocalTime changedTimestamp = LocalTime.parse(changedTimestampString, formatter);
                                     System.out.println("DELAY FLIGHT");
-                                    gestiunePiste.amanareZbor(idZborDeSchimbat, idPista, timestampSchimbat);
+                                    runwayManagement.delayFlight(flightIdToChange, runwayId, changedTimestamp);
                                     break;
                                 case "cancel":
                                     System.out.println("CANCEL FLIGHT");
-                                    gestiunePiste.eliminareZbor(idZborDeSchimbat, idPista);
+                                    runwayManagement.eliminateFlight(flightIdToChange, runwayId);
                                     break;
                                 case "move":
                                     System.out.println("MOVE FLIGHT");
-                                    String idPistaNoua = textLinie[5];
-                                    gestiunePiste.mutareZbor(idZborDeSchimbat, idPista, idPistaNoua, timestamp, pwExceptii);
+                                    String newRunwayId = lineStringsList[5];
+                                    runwayManagement.moveFlight(flightIdToChange, runwayId, newRunwayId, timestamp, pwForExceptions);
                                     break;
                             }
                         case "exit":
                             break;
                     }
                 }
-                pwExceptii.close();
+                pwForExceptions.close();
                 pwOut.close();
             } catch (FileNotFoundException e) {
                 throw new FileNotFoundException(e.getMessage());

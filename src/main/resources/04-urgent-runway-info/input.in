@@ -7,14 +7,14 @@
 01:10:00 - allocate_plane - wide body - Boeing 777 - FR3772 - Bergamo - Bucharest - 01:30:00 - Alpha
 01:50:00 - allocate_plane - narrow body - Boeing 737 - W43047 - Bucharest - Athens - 02:00:00 - Delta
 03:10:00 - allocate_plane - wide body - Boeing 777 - RO238 - Budapest - Bucharest - 03:50:00 - Alpha
-03:20:00 - allocate_plane - wide body - Boeing 777 - KL2701 - Amsterdam - Bucharest - 03:30:00 - Alpha - urgent
+03:20:00 - allocate_plane - wide body - Boeing 777 - KL2701 - Amsterdam - Bucharest - 03:30:00 - Alpha - urgentFlag
 03:22:00 - runway_info - Delta
 03:30:00 - runway_info - Alpha
 05:00:00 - allocate_plane - narrow body - Airbus A320 - RO265 - Bucharest - Istanbul - 05:10:00 - Delta
 05:20:00 - allocate_plane - narrow body - Boeing 737 - RO382 - Paris - Bucharest - 05:40:00 - Bravo
 05:22:00 - allocate_plane - narrow body - Boeing 737 - BA886 - London - Bucharest - 10:40:00 - Bravo
-10:10:00 - allocate_plane - narrow body - Embraer E2 - UX3703 - Madrid - Bucharest - 11:00:00 - Bravo - urgent
-10:11:00 - allocate_plane - narrow body - Embraer E2 - BT757 - Riga - Bucharest - 11:10:00 - Bravo - urgent
+10:10:00 - allocate_plane - narrow body - Embraer E2 - UX3703 - Madrid - Bucharest - 11:00:00 - Bravo - urgentFlag
+10:11:00 - allocate_plane - narrow body - Embraer E2 - BT757 - Riga - Bucharest - 11:10:00 - Bravo - urgentFlag
 10:40:00 - allocate_plane - narrow body - Airbus A320 - OS786 - Bucharest - Vienna - 11:10:00 - Delta
 10:45:00 - runway_info - Delta
 10:50:00 - allocate_plane - wide body - Airbus A350 - W43139 - Bucharest - Bologna - 11:20:00 - Charlie

@@ -6,9 +6,9 @@
 01:01:00 - allocate_plane - wide body - Airbus A380 - RO266 - Istanbul - Bucharest - 01:20:00 - Alpha
 01:02:00 - allocate_plane - wide body - Airbus A380 - LX1886 - Zurich - Bucharest - 01:40:00 - Alpha
 01:02:20 - allocate_plane - wide body - Airbus A380 - LX16 - Bucharest - Zurich - 01:41:00 - Alpha
-01:03:00 - allocate_plane - wide body - Airbus A380 - KL1337 - Amsterdam - Bucharest - 01:50:00 - Alpha - urgent
+01:03:00 - allocate_plane - wide body - Airbus A380 - KL1337 - Amsterdam - Bucharest - 01:50:00 - Alpha - urgentFlag
 01:04:00 - allocate_plane - wide body - Airbus A380 - W43146 - Rome - Bucharest - 01:10:00 - Alpha
-01:05:00 - allocate_plane - wide body - Airbus A380 - LH1654 - Munich - Bucharest - 01:55:00 - Alpha - urgent
+01:05:00 - allocate_plane - wide body - Airbus A380 - LH1654 - Munich - Bucharest - 01:55:00 - Alpha - urgentFlag
 01:06:00 - runway_info - Alpha
 01:07:00 - permission_for_maneuver - Alpha
 01:08:00 - permission_for_maneuver - Alpha
@@ -16,7 +16,7 @@
 01:09:00 - flight_info - W43146
 01:19:00 - permission_for_maneuver - Alpha
 01:20:00 - allocate_plane - wide body - Airbus A380 - LO643 - Warsaw - Bucharest - 01:50:00 - Alpha
-01:21:00 - allocate_plane - wide body - Airbus A380 - FZ1709 - Dubai - Bucharest - 01:59:00 - Alpha - urgent
+01:21:00 - allocate_plane - wide body - Airbus A380 - FZ1709 - Dubai - Bucharest - 01:59:00 - Alpha - urgentFlag
 01:22:00 - allocate_plane - wide body - Airbus A380 - H4258 - Dublin - Bucharest - 01:00:00 - Alpha
 01:23:00 - runway_info - Alpha
 01:27:00 - permission_for_maneuver - Alpha
@@ -24,18 +24,18 @@
 01:38:00 - permission_for_maneuver - Alpha
 01:39:00 - runway_info - Alpha
 01:40:00 - allocate_plane - wide body - Airbus A380 - FR3773 - Bergamo - Bucharest - 01:15:00 - Alpha
-01:41:00 - allocate_plane - wide body - Airbus A380 - OS786 - Vienna - Bucharest - 01:20:00 - Alpha - urgent
+01:41:00 - allocate_plane - wide body - Airbus A380 - OS786 - Vienna - Bucharest - 01:20:00 - Alpha - urgentFlag
 01:42:00 - allocate_plane - wide body - Airbus A380 - FR6285 - Pisa - Bucharest - 01:25:00 - Alpha
 01:43:00 - runway_info - Alpha
 04:00:00 - allocate_plane - narrow body - Airbus A320 - W04134 - Bologna - Bucharest - 04:15:00 - Bravo
 04:01:00 - allocate_plane - narrow body - Airbus A320 - RO662 - Istanbul - Bucharest - 04:10:00 - Bravo
-04:02:00 - allocate_plane - narrow body - Airbus A320 - LX6881 - Zurich - Bucharest - 04:11:00 - Bravo - urgent
+04:02:00 - allocate_plane - narrow body - Airbus A320 - LX6881 - Zurich - Bucharest - 04:11:00 - Bravo - urgentFlag
 04:03:00 - allocate_plane - narrow body - Airbus A320 - KL7731 - Amsterdam - Bucharest - 04:20:00 - Bravo
-04:04:00 - allocate_plane - narrow body - Airbus A320 - W64134 - Rome - Bucharest - 04:22:00 - Bravo - urgent
+04:04:00 - allocate_plane - narrow body - Airbus A320 - W64134 - Rome - Bucharest - 04:22:00 - Bravo - urgentFlag
 04:05:00 - runway_info - Bravo
 04:06:00 - permission_for_maneuver - Bravo
 04:08:00 - allocate_plane - narrow body - Airbus A320 - LH4561 - Munich - Bucharest - 04:30:00 - Bravo
-04:09:00 - allocate_plane - narrow body - Airbus A320 - LO346 - Warsaw - Bucharest - 04:33:00 - Bravo - urgent
+04:09:00 - allocate_plane - narrow body - Airbus A320 - LO346 - Warsaw - Bucharest - 04:33:00 - Bravo - urgentFlag
 04:10:00 - runway_info - Bravo
 04:12:00 - permission_for_maneuver - Bravo
 04:13:00 - flight_info - LX6881
@@ -43,7 +43,7 @@
 04:37:00 - permission_for_maneuver - Bravo
 04:48:00 - runway_info - Bravo
 08:00:00 - allocate_plane - wide body - Airbus A380 - JU107 - Bucharest - Belgrade - 08:15:00 - Charlie
-08:01:00 - allocate_plane - wide body - Airbus A380 - W43081 - Bucharest - Charleroi - 08:16:00 - Charlie - urgent
+08:01:00 - allocate_plane - wide body - Airbus A380 - W43081 - Bucharest - Charleroi - 08:16:00 - Charlie - urgentFlag
 08:02:00 - allocate_plane - wide body - Airbus A380 - W43235 - Bucharest - Stuttgart - 08:10:00 - Charlie
 08:03:00 - runway_info - Charlie
 08:04:00 - permission_for_maneuver - Charlie
@@ -53,7 +53,7 @@
 08:09:00 - permission_for_maneuver - Charlie
 08:10:00 - runway_info - Charlie
 10:00:00 - allocate_plane - narrow body - Airbus A320 - W43189 - Bucharest - Malaga - 00:20:00 - Delta
-10:01:00 - allocate_plane - narrow body - Airbus A320 - BT5646 - Bucharest - Prague - 00:22:00 - Delta - urgent
+10:01:00 - allocate_plane - narrow body - Airbus A320 - BT5646 - Bucharest - Prague - 00:22:00 - Delta - urgentFlag
 10:02:00 - allocate_plane - narrow body - Airbus A320 - UX3702 - Bucharest - Madrid - 00:15:00 - Delta
 10:03:00 - runway_info - Delta
 10:04:00 - permission_for_maneuver - Delta
