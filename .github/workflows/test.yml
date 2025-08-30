@@ -11,9 +11,12 @@ permissions:
 jobs:
   run-autograding-tests:
     runs-on: ubuntu-latest
+    # Use your bot filter; change to 'github-classroom[bot]' if needed
     if: github.actor != 'github-test[bot]'
     env:
+      # Force UTF-8 on the runner
       JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,14 +30,23 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      # TESTS
+      - name: Show env & test runtime deps
+        run: |
+          java -version
+          ./gradlew -v
+          ./gradlew dependencies --configuration testRuntimeClasspath
+          echo "=== Test sources tree ==="
+          ls -R src/test/java || true
+
+      # -------------------- TESTS --------------------
+
       - name: basicFlightSearch01
         id: basicflightsearch01
         uses: classroom-resources/autograding-command-grader@v1
         with:
           test-name: basicFlightSearch01
           setup-command: ''
-          command: ./gradlew --no-daemon test --tests "*TestMain.basicFlightSearch01"
+          command: ./gradlew --no-daemon --refresh-dependencies test --tests "*.*basicFlightSearch01" --info --stacktrace
           timeout: 30
           max-score: 2
 
@@ -44,7 +56,7 @@ jobs:
         with:
           test-name: exceptionsFlightSearch02
           setup-command: ''
-          command: ./gradlew --no-daemon test --tests "*TestMain.exceptionsFlightSearch02"
+          command: ./gradlew --no-daemon --refresh-dependencies test --tests "*.*exceptionsFlightSearch02" --info --stacktrace
           timeout: 30
           max-score: 2
 
@@ -54,7 +66,7 @@ jobs:
         with:
           test-name: basicRunwayInfo03
           setup-command: ''
-          command: ./gradlew --no-daemon test --tests "*TestMain.basicRunwayInfo03"
+          command: ./gradlew --no-daemon --refresh-dependencies test --tests "*.*basicRunwayInfo03" --info --stacktrace
           timeout: 30
           max-score: 4
 
@@ -64,7 +76,7 @@ jobs:
         with:
           test-name: urgentRunwayInfo04
           setup-command: ''
-          command: ./gradlew --no-daemon test --tests "*TestMain.urgentRunwayInfo04"
+          command: ./gradlew --no-daemon --refresh-dependencies test --tests "*.*urgentRunwayInfo04" --info --stacktrace
           timeout: 30
           max-score: 4
 
@@ -74,7 +86,7 @@ jobs:
         with:
           test-name: maneuverPrintFree05
           setup-command: ''
-          command: ./gradlew --no-daemon test --tests "*TestMain.maneuverPrintFree05"
+          command: ./gradlew --no-daemon --refresh-dependencies test --tests "*.*maneuverPrintFree05" --info --stacktrace
           timeout: 30
           max-score: 5
 
@@ -84,7 +96,7 @@ jobs:
         with:
           test-name: maneuverPrintOccupied06
           setup-command: ''
-          command: ./gradlew --no-daemon test --tests "*TestMain.maneuverPrintOccupied06"
+          command: ./gradlew --no-daemon --refresh-dependencies test --tests "*.*maneuverPrintOccupied06" --info --stacktrace
           timeout: 30
           max-score: 6
 
@@ -94,7 +106,7 @@ jobs:
         with:
           test-name: exceptionsManeuver07
           setup-command: ''
-          command: ./gradlew --no-daemon test --tests "*TestMain.exceptionsManeuver07"
+          command: ./gradlew --no-daemon --refresh-dependencies test --tests "*.*exceptionsManeuver07" --info --stacktrace
           timeout: 30
           max-score: 7
 
@@ -104,7 +116,7 @@ jobs:
         with:
           test-name: exceptionsAll08
           setup-command: ''
-          command: ./gradlew --no-daemon test --tests "*TestMain.exceptionsAll08"
+          command: ./gradlew --no-daemon --refresh-dependencies test --tests "*.*exceptionsAll08" --info --stacktrace
           timeout: 30
           max-score: 8
 
@@ -114,9 +126,11 @@ jobs:
         with:
           test-name: allCases09
           setup-command: ''
-          command: ./gradlew --no-daemon test --tests "*TestMain.allCases09"
+          command: ./gradlew --no-daemon --refresh-dependencies test --tests "*.*allCases09" --info --stacktrace
           timeout: 30
           max-score: 12
+
+      # ----------------- REPORT & ARTIFACTS -----------------
 
       - name: Autograding Reporter
         uses: classroom-resources/autograding-grading-reporter@v1
